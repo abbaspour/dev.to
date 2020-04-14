@@ -1,7 +1,7 @@
 ---
-published: false
+published: true
 title: 'Playing with Spotify API and Auth0'
-cover_image: 'https://raw.githubusercontent.com/abbaspour/dev.to/master/blog-posts/2020-04-09-spotify/assets/auth0-spotify.png'
+cover_image: 
 description: 'Connectivity between Spotify and Auth0'
 tags: spotify, auth0, api, oauth2.0
 series:

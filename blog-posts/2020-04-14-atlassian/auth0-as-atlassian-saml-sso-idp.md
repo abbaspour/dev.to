@@ -1,5 +1,5 @@
 ---
-published: false
+published: true
 title: 'Atlassian SAML SSO with Auth0 IdP'
 cover_image: 
 description: '[uth0 as SAML 2.0 SSO IdP for Atlassian'
