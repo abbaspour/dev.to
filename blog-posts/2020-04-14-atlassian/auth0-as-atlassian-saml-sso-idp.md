@@ -69,8 +69,19 @@ paste:
 And populate metadata mapping file into `Settings` section and *Save*
 
 ```json
-// code/saml2-addon-mapping.json
-
+{
+  "mappings": {
+    "user_id": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier",
+    "given_name": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname",
+    "family_name": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname"
+  },
+  "nameIdentifierProbes": [
+    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
+    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier",
+    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+  ],
+  "nameIdentifierFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:email"
+}
 ``` 
 
 ![08-addon-settings](./assets/08-settings.png)
