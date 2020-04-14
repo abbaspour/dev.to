@@ -273,8 +273,7 @@ Here we want to add Spotify `access_token` as a custom claim to Auth0 `id_token`
         form: {
           grant_type: 'refresh_token',
           refresh_token: refresh_token,
-        },
-        insecure: true,
+        }
       },
       (err, r, b) => {
         if (err) {

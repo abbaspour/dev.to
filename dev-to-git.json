@@ -1,6 +1,10 @@
 [
   {
-    "id": 303009,
+    "id": 303026,
     "relativePathToArticle": "./blog-posts/2020-04-09-spotify/playing-with-spotify-api-and-auth0.md"
+  },
+  {
+    "id": 308295,
+    "relativePathToArticle": "./blog-posts/2020-04-14-atlassian/auth0-as-atlassian-saml-sso-idp.md"
   }
 ]
