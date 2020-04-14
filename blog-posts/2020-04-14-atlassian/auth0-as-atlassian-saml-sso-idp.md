@@ -17,7 +17,7 @@ Inside your [Atlassian Organisation](https://admin.atlassian.com) you should hav
 1. A verified domain  
 2. [Atlassian Access](https://www.atlassian.com/software/access)  
 
-![Atlassian Access Cloud Installed](./assets/00-atlassian-prerequisite-access.png)
+![Atlassian Access Cloud Installed](https://raw.githubusercontent.com/abbaspour/dev.to/master/blog-posts/2020-04-14-atlassian/assets/00-atlassian-prerequisite-access.png)
 
 
 ## Setup
@@ -25,27 +25,27 @@ Inside your [Atlassian Organisation](https://admin.atlassian.com) you should hav
 ### Step 1. Auth0 IdP Client
 Create a "Regular Web Application in Auth0"
    
-![01-create-rwa-app](./assets/01-create-rwa-app.png)
+![01-create-rwa-app](https://raw.githubusercontent.com/abbaspour/dev.to/master/blog-posts/2020-04-14-atlassian/assets/01-create-rwa-app.png)
 
 ### Step 2. Add Connections to your App
 Make sure that correct set of Auth0 connections are associated to your IdP app.
 
-![02-app-connections](./assets/02-app-connections.png)
+![02-app-connections](https://raw.githubusercontent.com/abbaspour/dev.to/master/blog-posts/2020-04-14-atlassian/assets/02-app-connections.png)
 
 ### Step 3. Enable SAML2 Addon
 Go to application's Addons tab and enable *SAML2 Web App*.
 
-![03-saml2-addon](./assets/03-saml2-addon.png)
+![03-saml2-addon](https://raw.githubusercontent.com/abbaspour/dev.to/master/blog-posts/2020-04-14-atlassian/assets/03-saml2-addon.png)
 
 ### Step 4. IdP Metadata
 Go to *Usage* section in addon configuration. Here you find information to populate SAML metadata in Atlassian Access.
 
- ![04-addon-usage](./assets/04-addon-usage.png)
+ ![04-addon-usage](https://raw.githubusercontent.com/abbaspour/dev.to/master/blog-posts/2020-04-14-atlassian/assets/04-addon-usage.png)
 
 ### Step 5. Add SAML Connection in Atlassian
 In [Atlassian Admin](https://admin.atlassian.com) dashboard, go to `Organization > Security > SAML single sign-on`
 
-![05-add-saml](./assets/05-add-saml.png)
+![05-add-saml](https://raw.githubusercontent.com/abbaspour/dev.to/master/blog-posts/2020-04-14-atlassian/assets/05-add-saml.png)
 
 ### Step 6. Populate Configuration
 Copy configs from addon usage page (step 4) to SAML configuration.
@@ -54,12 +54,12 @@ Copy configs from addon usage page (step 4) to SAML configuration.
 * `Identity provider SSO URL` => `https://TENANT.auth0.com/samlp/APP_ID`
 * `Public x509 certificate` => Your tenant's `/pem` location https://TENANT.auth0.com/pem
  
-![06-config-saml](./assets/06-config-saml.png)
+![06-config-saml](https://raw.githubusercontent.com/abbaspour/dev.to/master/blog-posts/2020-04-14-atlassian/assets/06-config-saml.png)
 
 ### Step 7. Get SP Assertion Consumer Service URL
 Once configuration saves, you'll see a summary page, copy `SP Assertion Consumer Service URL` 
 
-![07-ACS](./assets/07-idp-url.png)
+![07-ACS](https://raw.githubusercontent.com/abbaspour/dev.to/master/blog-posts/2020-04-14-atlassian/assets/07-idp-url.png)
 
 ### Step 8. Configure Application Callback URL in Auth0 SAML2 Addon
 Go back to [Auth0 dashboard](https://manage.auth0.com) for your application's SAML2 addon setup tab and
@@ -84,13 +84,13 @@ And populate metadata mapping file into `Settings` section and *Save*
 }
 ``` 
 
-![08-addon-settings](./assets/08-settings.png)
+![08-addon-settings](https://raw.githubusercontent.com/abbaspour/dev.to/master/blog-posts/2020-04-14-atlassian/assets/08-settings.png)
 
 ### Step 9. Try Sign in with Verified Domain Email
 Visit [id.atlassian.com](https://id.atlassian.com/) and login with a `user@your-verified-domain.com`
 
-![09-try-with-email](./assets/09-try-with-email.png)
+![09-try-with-email](https://raw.githubusercontent.com/abbaspour/dev.to/master/blog-posts/2020-04-14-atlassian/assets/09-try-with-email.png)
 
 ### Step 10. Login with SAML IdP and return to Atlassian
 
-![10-success](./assets/10-success.png)
+![10-success](https://raw.githubusercontent.com/abbaspour/dev.to/master/blog-posts/2020-04-14-atlassian/assets/10-success.png)
