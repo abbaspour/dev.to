@@ -1,7 +1,7 @@
 ---
 published: true
 title: 'Playing with Spotify API and Auth0'
-cover_image: 
+cover_image:
 description: 'Connectivity between Spotify and Auth0'
 tags: spotify, auth0, api, oauth2.0
 series:
@@ -94,49 +94,46 @@ Let's add Spotofy as a custom social connection. Auth0 does the Authorization Co
 ```js
 // code/fetchUserProfile.js
 
-(() => {
-  function fetchUserProfile(accessToken, ctx, cb) {
-    request.get(
-      'https://api.spotify.com/v1/me',
-      {
-        headers: {
-          Authorization: 'Bearer ' + accessToken,
-          'User-Agent': 'Auth0',
+function fetchUserProfile(accessToken, ctx, cb) {
+  request.get(
+    'https://api.spotify.com/v1/me',
+    {
+      headers: {
+        Authorization: 'Bearer ' + accessToken,
+        'User-Agent': 'Auth0',
+      },
+      timeout: 10000,
+    },
+    (e, r, b) => {
+      if (e) return cb(e);
+      if (r.statusCode !== 200) return cb(new Error('invalid status:' + r.statusCode));
+
+      let info;
+      try {
+        info = JSON.parse(b);
+      } catch (e) {
+        return cb(new Error('invalid profile:'));
+      }
+
+      let profile = {
+        user_id: info.id,
+        name: info.display_name,
+        nickname: info.id,
+        app_metadata: {
+          spotify_link: info.href,
         },
-        timeout: 10000,
-      },
-      (e, r, b) => {
-        if (e) return cb(e);
-        if (r.statusCode !== 200) return cb(new Error('invalid status:' + r.statusCode));
+      };
+      if (info.email) {
+        profile.email = info.email;
+        profile.email_verified = false;
+      }
+      if (!_.isEmpty(info.images)) profile.picture = _.head(profile.images);
 
-        let info;
-        try {
-          info = JSON.parse(b);
-        } catch (e) {
-          return cb(new Error('invalid profile:'));
-        }
-
-        let profile = {
-          user_id: info.id,
-          name: info.display_name,
-          nickname: info.id,
-          app_metadata: {
-            spotify_link: info.href,
-          },
-        };
-        if (info.email) {
-          profile.email = info.email;
-          profile.email_verified = false;
-        }
-        if (!_.isEmpty(info.images)) profile.picture = _.head(profile.images);
-
-        cb(null, profile);
-      },
-    );
-  }
-  return fetchUserProfile;
-})()
-
+      //console.log('profile from spotify: ' + JSON.stringify(profile));
+      cb(null, profile);
+    },
+  );
+}
 ```
 
 We can now take that script and import it to Auth0 as a custom OAuth 2.0 connection using `create-spotify-connection.sh`:
@@ -150,6 +147,7 @@ Make sure https://tenant.auth0.com/login/callback is registered as valid callbac
 ---
 
 ```bash
+# code/create-spotify-connection.sh
 
 #!/bin/bash
 
@@ -241,6 +239,7 @@ curl --request POST \
     --url "${AUTH0_DOMAIN_URL}api/v2/connections" \
     --header 'content-type: application/json' \
     -d "${BODY}"
+
 ```
 
 ### Returning Spotify Access Token to Auth0 Client
@@ -250,47 +249,44 @@ Here we want to add Spotify `access_token` as a custom claim to Auth0 `id_token`
 ```js
 // code/spotify-access_token-rule.js
 
-(() => {
-  function renewSpotifyAccessToken(user, context, callback) {
-    let spotify_identity = _.find(user.identities, { connection: 'spotify' });
+function renewSpotifyAccessToken(user, context, callback) {
+  let spotify_identity = _.find(user.identities, { connection: 'spotify' });
 
-    if (_.isUndefined(spotify_identity)) {
-      console.log('no spotify_identity');
-      return callback(null, user, context);
-    }
-
-    const namespace = 'https://my.ns/';
-
-    let refresh_token = spotify_identity.refresh_token;
-    let client_id = configuration.spotify_client_id;
-    let client_secret = configuration.spotify_client_secret;
-
-    const basic_auth = new Buffer(client_id + ':' + client_secret).toString('base64');
-    request.post(
-      'https://accounts.spotify.com/api/token',
-      {
-        headers: { authorization: 'basic ' + basic_auth },
-        form: {
-          grant_type: 'refresh_token',
-          refresh_token: refresh_token,
-        }
-      },
-      (err, r, b) => {
-        if (err) {
-          return console.log(err);
-        }
-        if (r.statusCode !== 200) return new Error('StatusCode: ' + r.statusCode);
-        const info = JSON.parse(b);
-        console.log(JSON.stringify(info, null, '  '));
-
-        console.log('adding claim for spotify user: ' + spotify_identity.user_id);
-
-        context.idToken[namespace + 'spotify/access_token'] = info.access_token;
-        return callback(null, user, context);
-      },
-    );
+  if (_.isUndefined(spotify_identity)) {
+    //console.log('not spotify_identity');
+    return callback(null, user, context);
   }
-  return renewSpotifyAccessToken;
-})()
 
+  const namespace = 'https://my.ns/';
+
+  let refresh_token = spotify_identity.refresh_token;
+  let client_id = configuration.spotify_client_id;
+  let client_secret = configuration.spotify_client_secret;
+
+  const basic_auth = new Buffer(client_id + ':' + client_secret).toString('base64');
+
+  request.post(
+    'https://accounts.spotify.com/api/token',
+    {
+      headers: { authorization: 'basic ' + basic_auth },
+      form: {
+        grant_type: 'refresh_token',
+        refresh_token: refresh_token,
+      },
+    },
+    (err, r, b) => {
+      if (err) return callback(err);
+
+      if (r.statusCode !== 200) return callback(new Error('invalid status code: ' + r.statusCode));
+
+      const info = JSON.parse(b);
+      //console.log(JSON.stringify(info, null, '  '));
+
+      console.log('adding claim for spotify user: ' + spotify_identity.user_id);
+      context.idToken[namespace + 'spotify/access_token'] = info.access_token;
+
+      return callback(null, user, context);
+    },
+  );
+}
 ```

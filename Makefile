@@ -1,9 +1,10 @@
 
 check:
+	npm run embedme:check
 	npm run prettier:check
 
-write:
+prep:
 	npm run embedme:write
-	#npm run prettier:write
+	npm run prettier:write
 
-.phone: check write
+.PHONY: check write
