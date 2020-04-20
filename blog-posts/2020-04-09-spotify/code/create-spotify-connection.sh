@@ -11,7 +11,7 @@ command -v jq || { echo >&2 "error: jq not found"; exit 3; }
 function usage() {
     cat <<END >&2
 USAGE: $0 [-a access_token] [-c spotify_client_id] [-x spotify_client_secret] [-e auth0-client] [-s fetch] [-v|-h]
-        -a token    # access_token. default from environment variable
+        -a token    # management API access_token. default from environment variable access_token
         -c id       # spotify client_id
         -x secret   # spotify client_secret
         -s file     # fetchUserProfile.js JS file. default is 'fetchUserProfile.js'

@@ -162,7 +162,7 @@ command -v jq || { echo >&2 "error: jq not found"; exit 3; }
 function usage() {
     cat <<END >&2
 USAGE: $0 [-a access_token] [-c spotify_client_id] [-x spotify_client_secret] [-e auth0-client] [-s fetch] [-v|-h]
-        -a token    # access_token. default from environment variable
+        -a token    # management API access_token. default from environment variable access_token
         -c id       # spotify client_id
         -x secret   # spotify client_secret
         -s file     # fetchUserProfile.js JS file. default is 'fetchUserProfile.js'
@@ -241,6 +241,11 @@ curl --request POST \
     -d "${BODY}"
 
 ```
+
+You also have the option to install [Custom Social Connections Extension](https://auth0.com/docs/extensions/custom-social-extensions)
+to easily edit or view the Spotify connection. Here is how it looks for me:
+
+![custom-social-connections-ext-spotify.png](https://raw.githubusercontent.com/abbaspour/dev.to/master/blog-posts/2020-04-09-spotify/assets/custom-social-connections-ext-spotify.png)
 
 ### Returning Spotify Access Token to Auth0 Client
 
