@@ -1,6 +1,7 @@
 ## How can I find the ID of my blog post on dev.to?
 
-`$('div[data-article-id]').getAttribute('data-article-id')`
+- `$('div[data-article-id]').getAttribute('data-article-id')`
+- https://docs.dev.to/api/#operation/getArticleById
 
 ## References
 

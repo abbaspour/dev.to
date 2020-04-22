@@ -89,7 +89,7 @@ curl -sS -H "Authorization: Basic ${basic}" \
 
 ![Auth0 + Spotify](https://dev-to-uploads.s3.amazonaws.com/i/r13aiazzbvujw7htifxo.png)
 
-Let's add Spotofy as a custom social connection. Auth0 does the Authorization Code flow part. We need to supply endpoints and a `fetchUserProfile.js` script that does fetch user profile with an access token.
+Let's add Spotify as a custom social connection. Auth0 does the Authorization Code flow part. We need to supply endpoints and a `fetchUserProfile.js` script that does fetch user profile with an access token.
 
 ```js
 // code/fetchUserProfile.js
@@ -247,9 +247,45 @@ to easily edit or view the Spotify connection. Here is how it looks for me:
 
 ![custom-social-connections-ext-spotify.png](https://raw.githubusercontent.com/abbaspour/dev.to/master/blog-posts/2020-04-09-spotify/assets/custom-social-connections-ext-spotify.png)
 
+The resulting user profile has upstream IdP `refresh_token` which we'll benefit in the next section:
+
+```bash
+curl -s --get -H \
+    "Authorization: Bearer ${access_token}" \
+    -H 'content-type: application/json' \
+    'https://TENANT.auth0.com/api/v2/users/oauth2|spotify|xxx' | jq .
+{
+  "app_metadata": {
+    "spotify_link": "https://api.spotify.com/v1/users/xxx"
+  },
+  "created_at": "2020-04-21T23:19:10.023Z",
+  "email": "xxx@xxx.com",
+  "email_verified": false,
+  "identities": [
+    {
+      "provider": "oauth2",
+      "access_token": "BQBdE6xxx_xugA",
+      "refresh_token": "AQC2-xxxxp8lBTw",
+      "user_id": "spotify|xxx",
+      "connection": "spotify",
+      "isSocial": true
+    }
+  ],
+  "name": "xxx",
+  "nickname": "xxx",
+  "picture": "https://s.gravatar.com/avatar/c4538cc494b1706697e3a2254fbafc91?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fam.png",
+  "updated_at": "2020-04-21T23:19:10.023Z",
+  "user_id": "oauth2|spotify|xxx",
+  "last_ip": "101.114.146.180",
+  "last_login": "2020-04-21T23:19:10.023Z",
+  "logins_count": 1
+}
+```
+
 ### Returning Spotify Access Token to Auth0 Client
 
-Here we want to add Spotify `access_token` as a custom claim to Auth0 `id_token`. Note that Spotify access tokens expire in 1-hour. Hence we need silent authentication in Auth0 client to renew id_token and get a new Spotify access token every hour or so. That happens inside Auth0 rules:
+Here we want to add Spotify `access_token` as a custom claim to Auth0 `id_token`. Note that Spotify access tokens expire in 1-hour.
+Hence we need silent authentication in Auth0 client to renew id_token and get a new Spotify access token every hour or so. That happens inside Auth0 rules:
 
 ```js
 // code/spotify-access_token-rule.js
@@ -295,3 +331,16 @@ function renewSpotifyAccessToken(user, context, callback) {
   );
 }
 ```
+
+### A Point on Account Linking
+
+As I [mentioned here](https://twitter.com/aminize/status/1202442611857879040), no.7 of most repeated identity mistakes
+is silently linking users with unverified email address. That does apply to Spotify as well,
+since Spotify does not immediately verify email address. Bottom line is linking by just matching email, that can easily
+result in account takeover.
+
+![spotify-user-object](https://raw.githubusercontent.com/abbaspour/dev.to/master/blog-posts/2020-04-09-spotify/assets/spotify-user-object.png)
+
+According to Spotify [get-current-users-profile docs](https://developer.spotify.com/documentation/web-api/reference/users-profile/get-current-users-profile/) apparently
+there is currently no way to figure out if Spotify reported email is verified or not. Until such a flag is available,
+avoid any silent account-linking and instead offer managed account-linking.
